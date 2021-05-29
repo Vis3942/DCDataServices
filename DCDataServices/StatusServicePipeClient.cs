@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LogUtils;
 
 namespace DCDataServices
 {
@@ -65,7 +66,7 @@ namespace DCDataServices
             }
             else
             {
-                Console.WriteLine("Client already running.");
+                DCLogger.Information("Client already running.");
             }
         }
 
@@ -90,9 +91,9 @@ namespace DCDataServices
             while (!cts.IsCancellationRequested)
             {
                 clientPipe = new NamedPipeClientStream(".", _pipe_name, PipeDirection.InOut, PipeOptions.Asynchronous);
-                Console.WriteLine("attempting to connect.");
+                DCLogger.Information("attempting to connect.");
                 await clientPipe.ConnectAsync();
-                Console.WriteLine("successful connection");
+                DCLogger.Information("successful connection");
 
                 swriter = new StreamWriter(clientPipe);
                 swriter.AutoFlush = true;
@@ -114,7 +115,7 @@ namespace DCDataServices
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.Message);
+                        DCLogger.Error(e, "Writing to Status service pipe");
                         break;
                     }
                     System.Threading.Thread.Sleep(pingIntervalSecs * 1000);
@@ -142,7 +143,7 @@ namespace DCDataServices
             }
             else
             {
-                Console.WriteLine($"Not connected cannot write to pipe: {message}");
+                DCLogger.Error($"Not connected cannot write to pipe: {message}");
             }
         }
 

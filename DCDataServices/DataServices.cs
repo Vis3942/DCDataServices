@@ -1,4 +1,5 @@
 ﻿using DCDataServices.services.azuretable;
+using LogUtils;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -38,7 +39,7 @@ namespace DCDataServices
             }
             else
             {
-                Console.WriteLine($"unsupported service in startup options {AppOptions.GetAppOptions.Service}");
+                DCLogger.Information($"unsupported service in startup options {AppOptions.GetAppOptions.Service}");
             }
         }
 
@@ -63,7 +64,7 @@ namespace DCDataServices
                 ae.Flatten();
                 foreach (Exception e in ae.InnerExceptions)
                 {
-                    Console.WriteLine(e.Message);
+                    DCLogger.Error(e, "errors in Data service pipe client.");
                 }
             }
 

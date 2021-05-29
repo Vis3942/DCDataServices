@@ -1,4 +1,5 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using LogUtils;
+using Microsoft.Azure.Cosmos.Table;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -51,7 +52,7 @@ namespace DCDataServices.services.azuretable
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
                     //debug
-                    Console.WriteLine(responseBody);
+                    DCLogger.Debug(responseBody);
                     var jsonDoc = System.Text.Json.JsonDocument.Parse(responseBody);
                     var rootElement = jsonDoc.RootElement;
                     var connElement = rootElement.GetProperty("conn");
@@ -65,14 +66,13 @@ namespace DCDataServices.services.azuretable
                 }
                 catch (HttpRequestException e)
                 {
-                    Console.WriteLine("\nException Caught!");
-                    Console.WriteLine("Message :{0} ", e.Message);
+                    DCLogger.Error(e, "During Http Request");
                     return false;
                 }
             }
             else
             {
-                Console.WriteLine($"Failed to locate connection info filename {conn_info_fname}");
+                DCLogger.Error($"Failed to locate connection info filename {conn_info_fname}");
                 return false;
             }
         }
@@ -83,7 +83,7 @@ namespace DCDataServices.services.azuretable
             {
                 if (accessInfo == null)
                 {
-                    Console.WriteLine("No info from endpoint for computing access info.");
+                    DCLogger.Error("No info from endpoint for computing access info.");
                     return false;
                    
                 }
@@ -96,7 +96,7 @@ namespace DCDataServices.services.azuretable
             {
                 storageAccount = null;
                 tableClient = null;
-                Console.WriteLine($"error: {ex.Message}");
+                DCLogger.Error(ex, $"Getting storage account");
                 return false;
             }
         }
@@ -133,12 +133,8 @@ namespace DCDataServices.services.azuretable
                         cloudTable = tableClient.GetTableReference(accessInfo.TableName);
                         if (await cloudTable.CreateIfNotExistsAsync())
                         {
-                            Console.WriteLine($"Created Table named: {accessInfo.TableName}");
+                            DCLogger.Information($"Created Table named: {accessInfo.TableName}");
                         }
-                        //else
-                        //{
-                        //    Console.WriteLine($"Table {startOpts.TableName} exists");
-                        //}
                     }
                     TableBatchOperation batchOperation = new TableBatchOperation();
                     foreach (var tmp_entry in to_push_data)
@@ -157,8 +153,7 @@ namespace DCDataServices.services.azuretable
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    Console.WriteLine($"Table batch operation upload failed. {accessInfo.TableName}");
+                    DCLogger.Error(ex, $"Table batch operation upload failed. {accessInfo.TableName}");
                     //throw;
                     return false;
                 }
@@ -166,7 +161,7 @@ namespace DCDataServices.services.azuretable
             }
             else
             {
-                Console.WriteLine($"Table upload failed {accessInfo.TableName}");
+                DCLogger.Error($"Table upload failed {accessInfo.TableName}");
                 return false;
             }
         }

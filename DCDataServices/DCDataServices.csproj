@@ -11,6 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="LogUtils">
+      <HintPath>..\..\LogUtils\LogUtils\bin\Release\netstandard2.0\LogUtils.dll</HintPath>
+    </Reference>
     <Reference Include="UtilsLibrary">
       <HintPath>..\req_libs\UtilsLibrary.dll</HintPath>
     </Reference>
@@ -23,6 +26,23 @@
     <None Update="services\azuretable\azure_connection_info.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="VersionInfo.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>VersionInfo.txt</LastGenOutput>
+    </None>
+    <None Update="VersionInfo.txt">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>VersionInfo.tt</DependentUpon>
+    </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy /Y  $(ProjectDir)VersionInfo.txt  $(OutDir)" />
+  </Target>
 
 </Project>

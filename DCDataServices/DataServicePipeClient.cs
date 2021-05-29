@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LogUtils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
@@ -52,7 +53,7 @@ namespace DCDataServices
             }
             else
             {
-                Console.WriteLine("Client already running.");
+                DCLogger.Information("Client already running.");
             }
         }
 
@@ -77,11 +78,11 @@ namespace DCDataServices
         {
             while (!cts.IsCancellationRequested)
             {
-                Console.WriteLine("initializing clientPipe");
+                DCLogger.Information("initializing clientPipe");
                 clientPipe = new NamedPipeClientStream(".", _pipe_name, PipeDirection.InOut, PipeOptions.Asynchronous);
-                Console.WriteLine("attempting to connect.");
+                DCLogger.Information("attempting to connect.");
                 await clientPipe.ConnectAsync();
-                Console.WriteLine("successful connection");
+                DCLogger.Information("successful connection");
 
                 swriter = new StreamWriter(clientPipe)
                 {
@@ -93,7 +94,7 @@ namespace DCDataServices
                 {
                     string line = await sreader.ReadLineAsync();
                     // debug
-                    //Console.WriteLine(string.Format("pipe client: Rd: {0}", line));
+                    DCLogger.Debug(string.Format("pipe client: Rd: [{0}]", line));
                     if ((line == null) || (line.Equals("end")) || (line.Length == 0))
                     {
                         break;
@@ -118,7 +119,7 @@ namespace DCDataServices
             }
             else
             {
-                Console.WriteLine("is it connected.");
+                DCLogger.Information("is it connected.");
             }
         }
     }

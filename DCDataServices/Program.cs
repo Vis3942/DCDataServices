@@ -1,4 +1,5 @@
 ﻿using System;
+using LogUtils;
 
 namespace DCDataServices
 {
@@ -6,7 +7,15 @@ namespace DCDataServices
     {
         static void Main()
         {
-            Console.WriteLine("Starting Data Services.");
+            DCLogger.InitLogger(
+                log_to: AppOptions.GetAppOptions.LogTo,
+                log_level: AppOptions.GetAppOptions.LogLevel,
+                max_file_count: AppOptions.GetAppOptions.MaxCountFiles,
+                max_file_size_mb: AppOptions.GetAppOptions.MaxLogFileSizeMB,
+                log_file_name: AppOptions.GetAppOptions.LogFileName
+            );
+
+            DCLogger.Information("Starting Data Services.");
             try
             {
                 DataServices ds = new DataServices();
@@ -16,9 +25,9 @@ namespace DCDataServices
             {
                 foreach (var e in ae.InnerExceptions)
                 {
-                    Console.WriteLine($"Main: {e.GetType().Name}: {e.Message}");
+                    DCLogger.Error(e, $"Caught in Main: {e.GetType().ToString()}");
                 }
-                Console.WriteLine("Exited DCDataServices");
+                DCLogger.Information("Exited DCDataServices");
             }
             //try
             //{

@@ -6,5 +6,10 @@
   "StatusPipeConnectionName": "DCStatusPipe",
   "AppTrueState": "DCDS-WWW-True",
   "AppFalseState": "DCDS-WWW-False",
-  "PingIntervalSeconds": 2
+  "PingIntervalSeconds": 2,
+  "LogTo": "console",
+  "LogLevel": "information",
+  "MaxLogFileSizeMB": 1,
+  "MaxCountFiles": 5,
+  "LogFileName" :  "ds_app_log.txt"
 }
