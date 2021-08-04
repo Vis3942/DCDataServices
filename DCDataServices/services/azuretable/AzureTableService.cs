@@ -1,6 +1,8 @@
 ﻿using LogUtils;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using UtilsLibrary;
@@ -57,13 +59,23 @@ namespace DCDataServices.services.azuretable
                 {
                     lost_upload_count++;
                     System.IO.File.WriteAllText(UPLOAD_FAIL_COUNT_FILENAME, lost_upload_count.ToString());
-                    if (lost_upload_count > 6)
-                    {
-                        // need to inform azure endpoint as we have tried 3 reboots already.
-                    }
-                    else if (lost_upload_count % 2 == 0)
+                    //if (lost_upload_count > 6)
+                    //{
+                    //    // need to inform azure endpoint as we have tried 3 reboots already.
+                    //}
+                    //else 
+                    if (lost_upload_count % 2 == 0)
                     {
                         // Exit app; and service will restart it
+                        if (lost_upload_count > 3)
+                        {
+                            if (helperPLS.GetPushDataErrorMessage.Contains("Make sure the value of Authorization header is formed correctly"))
+                            {
+                                // execute script to reboot the DC
+                                reboot_dc(); // possible timing error on upload to Azure
+                            }
+                            // and error is "Make sure value of Authorization header is formed correctly"
+                        }
                         System.Environment.Exit(-1);
                     }
                 }
@@ -71,6 +83,27 @@ namespace DCDataServices.services.azuretable
                 {
                     System.IO.File.WriteAllText(UPLOAD_FAIL_COUNT_FILENAME, "1");
                 }
+            }
+        }
+
+        private void reboot_dc()
+        {
+            // write 1 to /home/debian/dc_restart/schedule_dc_reboot.txt
+            string wr_fname = AppOptions.GetAppOptions.RestartFileName;
+            try
+            {
+                DCLogger.Information("Required Reboot DC.");
+                //Pass the filepath and filename to the StreamWriter Constructor
+                StreamWriter sw = new StreamWriter(path: wr_fname);
+                //Write a line of text
+                sw.WriteLine("1");
+                //Write a second line of text
+                //Close the file
+                sw.Close();
+            }
+            catch (Exception e)
+            {
+                DCLogger.Error(e, "writing restart flag to file");
             }
         }
         #endregion util_funcs

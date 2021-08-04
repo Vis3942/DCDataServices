@@ -1,0 +1,16 @@
+{
+  "Service": "AzureTable",
+  "PipeConnectionName": "PLSDCConnection",
+  "DBDirectory": "/var/spool/litedb",
+  "MaximumStoredSamples": 10000,
+  "StatusPipeConnectionName": "DCStatusPipe",
+  "AppTrueState": "DCDS-WWW-True",
+  "AppFalseState": "DCDS-WWW-False",
+  "PingIntervalSeconds": 2,
+  "LogTo": "console",
+  "LogLevel": "information",
+  "MaxLogFileSizeMB": 1,
+  "MaxCountFiles": 5,
+  "LogFileName": "ds_app_log.txt",
+  "RestartFileName": "/home/debian/dc_restart/schedule_dc_reboot.txt"
+}

@@ -18,9 +18,14 @@ namespace DCDataServices.services.azuretable
         private readonly HttpClient httpClient = new HttpClient();
         CloudTable cloudTable = null;
         AccessInfo accessInfo = null;
+        private string pdErrorMessage = "";
         #endregion //vars
 
         #region property
+        public string GetPushDataErrorMessage
+        {
+            get { return pdErrorMessage; }
+        }
         #endregion // property
 
         public AzureHelperPLS()
@@ -31,7 +36,15 @@ namespace DCDataServices.services.azuretable
         {
             if (startOpts != null)
             {
-                return true;
+                if (accessInfo != null)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+                //return true;
             }
             else
             {
@@ -67,6 +80,12 @@ namespace DCDataServices.services.azuretable
                 catch (HttpRequestException e)
                 {
                     DCLogger.Error(e, "During Http Request");
+                    if (e.InnerException != null)
+                    {
+                        DCLogger.Error(e.InnerException, "During Http Request: Innter Exception");
+                    }
+                    startOpts = null;
+                    accessInfo = null;
                     return false;
                 }
             }
@@ -104,14 +123,15 @@ namespace DCDataServices.services.azuretable
 
         public async Task<bool> PushData(List<AzureTableData> to_push_data)
         {
+            pdErrorMessage = "";
             // assume that all the items in the list to_push_data have the same partition key
-
             if (startOpts == null)
             {
                 Task<bool> t1 = LoadConnectionInfo();
                 t1.Wait();
                 if (!t1.Result)
                 {
+                    pdErrorMessage = "Failed to load connection info";
                     return false;
                 }
             }
@@ -120,6 +140,7 @@ namespace DCDataServices.services.azuretable
                 bool sts = GetStorageAccount();
                 if (!sts)
                 {
+                    pdErrorMessage = "Failed to obtain storage account";
                     return false;
                 }
             }
@@ -147,7 +168,8 @@ namespace DCDataServices.services.azuretable
                         return true;
                     }
                     else
-                    { 
+                    {
+                        pdErrorMessage = $"Failed at ExecuteBatchAsync. Invalid count in response uploaded {batchOperation.Count} result = {result.Count}";
                         return false; 
                     }
                 }
@@ -155,6 +177,7 @@ namespace DCDataServices.services.azuretable
                 {
                     DCLogger.Error(ex, $"Table batch operation upload failed. {accessInfo.TableName}");
                     //throw;
+                    pdErrorMessage = ex.Message;
                     return false;
                 }
 
@@ -162,6 +185,8 @@ namespace DCDataServices.services.azuretable
             else
             {
                 DCLogger.Error($"Table upload failed {accessInfo.TableName}");
+                DCLogger.Error($"Table upload failed startopts = {startOpts == null}, account = {storageAccount == null}, tableclient = {tableClient == null}");
+                pdErrorMessage = "one or more of startOpts, storageAccount, tableClient was null";
                 return false;
             }
         }

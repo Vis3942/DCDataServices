@@ -1,4 +1,5 @@
-﻿using DCDataServices.services.azuretable;
+﻿using DCDataServices.services.api.v1;
+using DCDataServices.services.azuretable;
 using LogUtils;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,10 @@ namespace DCDataServices
             {
                 dataService = new AzureTableService(AppOptions.GetAppOptions.DBDirectory, sspc);
             }
+            else if (AppOptions.GetAppOptions.Service.ToLower().Equals("apidata"))
+            {
+                dataService = new APIDataService();
+            }
             else
             {
                 DCLogger.Information($"unsupported service in startup options {AppOptions.GetAppOptions.Service}");
@@ -65,6 +70,7 @@ namespace DCDataServices
                 foreach (Exception e in ae.InnerExceptions)
                 {
                     DCLogger.Error(e, "errors in Data service pipe client.");
+                    DCLogger.Error(e.StackTrace);
                 }
             }
 
