@@ -13,16 +13,16 @@ namespace DCDataServices.services.azuretable
     {
         #region vars
         private readonly AzureHelperPLS helperPLS = new AzureHelperPLS();
-        private readonly string DBDirectory;
+        //private readonly string DBDirectory;
         StatusServicePipeClient sspc = null;
         private readonly string UPLOAD_FAIL_COUNT_FILENAME = "UploadFailCount.txt";
+        private readonly int count_update_past_datasets; // max number of sets to push if in data store
         #endregion //vars
 
 
         #region constructor
-        public AzureTableService(string db_directory, StatusServicePipeClient sspc_loc)
+        public AzureTableService(StatusServicePipeClient sspc_loc)
         {
-            DBDirectory = db_directory;
             sspc = sspc_loc;
             Task load_conn_task = helperPLS.LoadConnectionInfo();
             load_conn_task.Wait();
@@ -34,6 +34,7 @@ namespace DCDataServices.services.azuretable
             {
                 sspc.InternetConnectionActive = false;
             }
+            count_update_past_datasets = AppOptions.GetAppOptions.DBPastDataUpdateCount;
         }
         #endregion //constructor
 
@@ -137,9 +138,9 @@ namespace DCDataServices.services.azuretable
             int num_items = 0; 
             if ( (stored_elem_count > 0) && (succ_upload) )
             {
-                if (stored_elem_count > 3)
+                if (stored_elem_count > count_update_past_datasets)
                 {
-                    num_items = 3;
+                    num_items = count_update_past_datasets;
                 }
                 else
                 {

@@ -18,12 +18,21 @@ namespace DCDataServices.services.azuretable
         {
             if (liteDB == null)
             {
-                string db_dir = AppOptions.GetAppOptions.DBDirectory;
-                maxElementCount = AppOptions.GetAppOptions.MaximumStoredSamples;
-                // open database (or create if doesn't exist)
-                string db_path = System.IO.Path.Combine(db_dir, DB_NAME);
-                liteDB = new LiteDatabase(db_path);
-                nd_collection = liteDB.GetCollection<NodeDataDB>("nodedata");
+                try
+                {
+                    string db_dir = AppOptions.GetAppOptions.DBDirectory;
+                    maxElementCount = AppOptions.GetAppOptions.MaximumStoredSamples;
+                    // open database (or create if doesn't exist)
+                    string db_path = System.IO.Path.Combine(db_dir, DB_NAME);
+                    liteDB = new LiteDatabase(db_path);
+                    nd_collection = liteDB.GetCollection<NodeDataDB>("nodedata");
+
+                }
+                catch (Exception e_initdb)
+                {
+                    LogUtils.DCLogger.Error(e_initdb, "InitLiteDB()");
+                    liteDB = null;
+                }            
             }
         }
 
@@ -39,7 +48,6 @@ namespace DCDataServices.services.azuretable
             }
             else
             {
-                // debug
                 List<NodeDataDB> tl_nd = nd_collection.Query()
                     .OrderBy(x => x.SampleTime)
                     .ToList();
@@ -147,6 +155,8 @@ namespace DCDataServices.services.azuretable
             }
             else
             {
+                LogUtils.DCLogger.Error("LiteDB init failed. Discarding elements.");
+                LogUtils.DCLogger.Error(nd_db.NDJson);
                 return false;
             }
         }

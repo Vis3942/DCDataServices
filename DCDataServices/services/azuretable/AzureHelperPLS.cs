@@ -19,6 +19,7 @@ namespace DCDataServices.services.azuretable
         CloudTable cloudTable = null;
         AccessInfo accessInfo = null;
         private string pdErrorMessage = "";
+        private bool internet_available_time_set = false;
         #endregion //vars
 
         #region property
@@ -124,6 +125,21 @@ namespace DCDataServices.services.azuretable
         public async Task<bool> PushData(List<AzureTableData> to_push_data)
         {
             pdErrorMessage = "";
+            bool i_sts = false;
+            if (!internet_available_time_set)
+            {
+                i_sts = CheckDCSystemTime.CheckSystemTime();
+                if (!i_sts)
+                {
+                    internet_available_time_set = false;
+                    return false;
+                }
+                else
+                {
+                    internet_available_time_set = true;
+                }
+            }
+
             // assume that all the items in the list to_push_data have the same partition key
             if (startOpts == null)
             {

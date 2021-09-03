@@ -36,7 +36,7 @@ namespace DCDataServices
             sspc.StartClient();
             if (AppOptions.GetAppOptions.Service.ToLower().Equals("azuretable"))
             {
-                dataService = new AzureTableService(AppOptions.GetAppOptions.DBDirectory, sspc);
+                dataService = new AzureTableService(sspc);
             }
             else if (AppOptions.GetAppOptions.Service.ToLower().Equals("apidata"))
             {

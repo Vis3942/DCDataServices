@@ -9,6 +9,7 @@ namespace DCDataServices
         public string Service { get; set; }
         public string PipeConnectionName { get; set; }
         public string DBDirectory { get; set; }
+        public int DBPastDataUpdateCount { get; set; }
         public int MaximumStoredSamples { get; set; }
         public string StatusPipeConnectionName { get; set; }
         public string AppTrueState { get; set; }
