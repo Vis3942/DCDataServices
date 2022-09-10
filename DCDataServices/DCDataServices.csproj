@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="dcds_startup_options.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="params\dcds_startup_options.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="scripts\dc_reboot.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -29,8 +29,8 @@
     <None Update="scripts\settimecsharp.sh">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="services\azuretable\azure_connection_info.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <None Update="params\azure_connection_info.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
     <None Update="VersionInfo.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

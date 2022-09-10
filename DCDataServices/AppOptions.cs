@@ -12,7 +12,20 @@ namespace DCDataServices
         private static readonly string OptionsFileName = "dcds_startup_options.json";
         private static bool OptionsLoaded = false;
         private static StartupOption startOptions = null;
+        private static string PARAMETERS_DIRECTORY = "params";
         #endregion //var
+
+        public static string ParameterDirectory
+        {
+            get
+            {
+                return PARAMETERS_DIRECTORY;
+            }
+            set
+            {
+                PARAMETERS_DIRECTORY = value;
+            }
+        }
 
         public static StartupOption GetAppOptions
         {
@@ -30,12 +43,12 @@ namespace DCDataServices
         {
             if (!OptionsLoaded)
             {
-                if (System.IO.File.Exists(OptionsFileName))
+                string options_path_fname = System.IO.Path.Combine(AppOptions.ParameterDirectory, OptionsFileName);
+                if (System.IO.File.Exists(options_path_fname))
                 {
-
                     try
                     {
-                        string jsonstr = System.IO.File.ReadAllText(OptionsFileName);
+                        string jsonstr = System.IO.File.ReadAllText(options_path_fname);
                         startOptions = System.Text.Json.JsonSerializer.Deserialize<StartupOption>(jsonstr);
                         OptionsLoaded = true;
                     }
@@ -45,11 +58,10 @@ namespace DCDataServices
                         OptionsLoaded = false;
                         startOptions = null;
                     }
-
                 }
                 else
                 {
-                    Console.WriteLine($"startup options file {OptionsFileName} missing.");
+                    Console.WriteLine($"startup options file {options_path_fname} missing.");
                 }
             }
         }

@@ -93,8 +93,7 @@ namespace DCDataServices
                 while (!cts.IsCancellationRequested)
                 {
                     string line = await sreader.ReadLineAsync();
-                    // debug
-                    DCLogger.Debug(string.Format("pipe client: Rd: [{0}]", line));
+                    DCLogger.Verbose(string.Format("pipe client: Rd: [{0}]", line));
                     if ((line == null) || (line.Equals("end")) || (line.Length == 0))
                     {
                         break;

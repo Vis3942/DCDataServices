@@ -11,8 +11,8 @@ namespace DCDataServices
 {
     public class DataServices
     {
+
         #region vars
-        private const string STARTUP_OPTIONS_FILENAME = "dcds_startup_options.json";
         //private StartupOption startupOption = null;
         private DataServicePipeClient dataServicePipeClient = null;
         private IDCDataService dataService = null;

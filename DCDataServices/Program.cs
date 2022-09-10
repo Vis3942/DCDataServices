@@ -5,29 +5,52 @@ namespace DCDataServices
 {
     class Program
     {
-        static void Main()
+        private static string AppConfigDirectory = "/home/debian/config/dataservices"; 
+        static void Main(string[] args)
         {
-            DCLogger.InitLogger(
-                log_to: AppOptions.GetAppOptions.LogTo,
-                log_level: AppOptions.GetAppOptions.LogLevel,
-                max_file_count: AppOptions.GetAppOptions.MaxCountFiles,
-                max_file_size_mb: AppOptions.GetAppOptions.MaxLogFileSizeMB,
-                log_file_name: AppOptions.GetAppOptions.LogFileName
-            );
-
-            DCLogger.Information("Starting Data Services.");
-            try
+            if (args.Length > 0)
             {
-                DataServices ds = new DataServices();
-                ds.StartPipeClient();
+                AppOptions.ParameterDirectory = args[0];
             }
-            catch (AggregateException ae)
+            else
             {
-                foreach (var e in ae.InnerExceptions)
+                AppOptions.ParameterDirectory = AppConfigDirectory;
+            }
+            if (AppOptions.GetAppOptions != null )
+            {
+                DCLogger.InitLogger(
+                    log_to: AppOptions.GetAppOptions.LogTo,
+                    log_level: AppOptions.GetAppOptions.LogLevel,
+                    max_file_count: AppOptions.GetAppOptions.MaxCountFiles,
+                    max_file_size_mb: AppOptions.GetAppOptions.MaxLogFileSizeMB,
+                    log_file_name: AppOptions.GetAppOptions.LogFileName
+                );
+                DCLogger.Information("Starting Data Services.");
+                try
                 {
-                    DCLogger.Error(e, $"Caught in Main: {e.GetType().ToString()}");
+                    DataServices ds = new DataServices();
+                    ds.StartPipeClient();
                 }
-                DCLogger.Information("Exited DCDataServices");
+                catch (AggregateException ae)
+                {
+                    foreach (var e in ae.InnerExceptions)
+                    {
+                        DCLogger.Error(e, $"Caught in Main: {e.GetType().ToString()}");
+                    }
+                    DCLogger.Information("Exited DCDataServices");
+                }
+            }
+            else
+            {
+                // load default options and write error info to file and exit
+                DCLogger.InitLogger(
+                    log_to: "file",
+                    log_level: "information",
+                    max_file_count: 10,
+                    max_file_size_mb: 5,
+                    log_file_name: "ds_app_log.txt"
+                );
+                DCLogger.Error($"Failed to load options from {AppConfigDirectory}");
             }
             //try
             //{

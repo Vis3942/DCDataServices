@@ -146,25 +146,30 @@ namespace DCDataServices.services.azuretable
                 {
                     num_items = stored_elem_count;
                 }
-                List<NodeDataDB> stored_data = AzureDataStore.GetElements(num_items);
-                if (stored_data.Count > 0)
+                int send_count = 0;
+                while ( (send_count < num_items) && (succ_upload) )
                 {
-                    List<AzureTableData> to_upload_stored_data = new List<AzureTableData>();
-                    foreach (var st_data in stored_data)
+                    List<NodeDataDB> stored_data = AzureDataStore.GetElements(1);
+                    if (stored_data.Count > 0)
                     {
-                        List<AzureTableData> tl_atd = System.Text.Json.JsonSerializer.Deserialize<List<AzureTableData>>(st_data.NDJson);
-                        to_upload_stored_data.InsertRange(to_upload_stored_data.Count, tl_atd);
-                    }
-                    var task_l = helperPLS.PushData(to_upload_stored_data);
-                    task_l.Wait();
-                    succ_upload = task_l.Result;
-                    sspc.InternetConnectionActive = succ_upload;
-                    DCLogger.Information($"Upload of {to_upload_stored_data.Count} saved elements, status = {succ_upload}");
-                    if (succ_upload)
-                    {
-                        stored_elem_count -= stored_data.Count;
-                        int del_count = AzureDataStore.DeleteElements(stored_data[stored_data.Count - 1]);
-                        DCLogger.Information($"deleted {del_count} elements from data base");
+                        List<AzureTableData> to_upload_stored_data = new List<AzureTableData>();
+                        foreach (var st_data in stored_data)
+                        {
+                            List<AzureTableData> tl_atd = System.Text.Json.JsonSerializer.Deserialize<List<AzureTableData>>(st_data.NDJson);
+                            to_upload_stored_data.InsertRange(to_upload_stored_data.Count, tl_atd);
+                        }
+                        var task_l = helperPLS.PushData(to_upload_stored_data);
+                        task_l.Wait();
+                        succ_upload = task_l.Result;
+                        sspc.InternetConnectionActive = succ_upload;
+                        DCLogger.Information($"Upload of {to_upload_stored_data.Count} saved elements, status = {succ_upload}");
+                        if (succ_upload)
+                        {
+                            stored_elem_count -= stored_data.Count;
+                            int del_count = AzureDataStore.DeleteElements(stored_data[stored_data.Count - 1]);
+                            DCLogger.Information($"deleted {del_count} elements from data base");
+                            send_count = send_count + 1;
+                        }
                     }
                 }
             }

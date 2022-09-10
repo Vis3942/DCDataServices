@@ -55,7 +55,7 @@ namespace DCDataServices.services.azuretable
 
         public async Task<bool> LoadConnectionInfo()
         {
-            string conn_info_fname = System.IO.Path.Combine("services", "azuretable", AZURE_CONNECTION_INFO_FILENAME);
+            string conn_info_fname = System.IO.Path.Combine(AppOptions.ParameterDirectory, AZURE_CONNECTION_INFO_FILENAME);
             if (System.IO.File.Exists(conn_info_fname))
             {
                 string json_str_from_file = System.IO.File.ReadAllText(conn_info_fname);

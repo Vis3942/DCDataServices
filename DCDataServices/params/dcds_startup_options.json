@@ -1,7 +1,7 @@
 {
   "Service": "AzureTable",
   "PipeConnectionName": "PLSDCConnection",
-  "DBDirectory": "/var/spool/litedb",
+  "DBDirectory": "/media/card/dblite",
   "DBPastDataUpdateCount":  5,
   "MaximumStoredSamples": 10000,
   "StatusPipeConnectionName": "DCStatusPipe",
